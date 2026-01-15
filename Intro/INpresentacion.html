@@ -1,0 +1,525 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Introducción al Curso Evaluación de Riesgos - GSM</title>
+    <style>
+        :root {
+            --primary: #0056b3; /* Azul Institucional */
+            --dark: #1a252f;
+            --accent: #c0a16b;  /* Dorado */
+            --bg: #fdfdfd;
+            --text: #333;
+            --white: #ffffff;
+            --slide-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #2c3e50;
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* Contenedor Principal 16:9 */
+        .slide-deck {
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            background-color: var(--bg);
+            position: relative;
+            box-shadow: var(--slide-shadow);
+            border-radius: 8px;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Barra de Progreso */
+        .progress-bar {
+            height: 5px;
+            background: #e0e0e0;
+            width: 100%;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Header / Marca de Agua */
+        .header-logo {
+            position: absolute;
+            top: 20px;
+            right: 30px;
+            text-align: right;
+            z-index: 10;
+        }
+        .header-logo h4 {
+            margin: 0;
+            color: var(--primary);
+            font-size: 1rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        .header-logo span {
+            font-size: 0.8rem;
+            color: var(--accent);
+        }
+
+        /* Slides */
+        .slide {
+            flex: 1;
+            display: none;
+            padding: 40px 60px;
+            flex-direction: column;
+            justify-content: center;
+            animation: fadeIn 0.5s ease;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tipografía */
+        h1 {
+            font-size: 2.5rem;
+            color: var(--primary);
+            margin-bottom: 10px;
+            line-height: 1.2;
+        }
+        h2 {
+            font-size: 1.8rem;
+            color: var(--dark);
+            margin-bottom: 20px;
+            border-bottom: 3px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+        h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin-top: 0;
+        }
+        p, li {
+            font-size: 1.1rem;
+            color: var(--text);
+            line-height: 1.5;
+            margin-bottom: 10px;
+        }
+
+        /* Elementos Gráficos */
+        .box {
+            background: #f4f6f7;
+            border-left: 5px solid var(--primary);
+            padding: 15px 20px;
+            margin-bottom: 15px;
+            border-radius: 0 5px 5px 0;
+        }
+
+        .timeline {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 30px;
+            gap: 10px;
+        }
+        .timeline-item {
+            flex: 1;
+            background: var(--white);
+            border: 1px solid #ddd;
+            padding: 15px;
+            border-radius: 8px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+            text-align: center;
+        }
+        .timeline-year {
+            background: var(--primary);
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-weight: bold;
+            display: inline-block;
+            margin-bottom: 10px;
+        }
+
+        /* Diagrama ESRM (Circular) */
+        .esrm-container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            grid-template-rows: 1fr 1fr;
+            gap: 15px;
+            max-width: 600px;
+            margin: 0 auto;
+            position: relative;
+        }
+        .esrm-box {
+            background: #f0f8ff;
+            border: 2px solid var(--primary);
+            padding: 20px;
+            text-align: center;
+            border-radius: 10px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            font-weight: bold;
+            color: var(--primary);
+        }
+        .esrm-center {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: var(--dark);
+            color: white;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            box-shadow: 0 0 15px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+
+        /* Diagrama Input-Process-Output */
+        .process-flow {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 20px;
+            margin-top: 30px;
+        }
+        .flow-box {
+            padding: 20px;
+            background: var(--primary);
+            color: white;
+            border-radius: 8px;
+            width: 180px;
+            text-align: center;
+        }
+        .arrow {
+            font-size: 2rem;
+            color: var(--accent);
+        }
+
+        /* Grid de Estándares */
+        .standards-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-top: 20px;
+        }
+        .std-card {
+            background: white;
+            border: 1px solid #eee;
+            padding: 20px;
+            border-left: 4px solid var(--accent);
+            box-shadow: 0 3px 6px rgba(0,0,0,0.05);
+        }
+
+        /* Footer Controles */
+        .controls {
+            height: 70px;
+            background: #f1f1f1;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-top: 1px solid #ccc;
+        }
+        button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+        button:hover { background: #004494; }
+        button:disabled { background: #ccc; cursor: default; }
+        .btn-reset { background: var(--dark); }
+
+    </style>
+</head>
+<body>
+
+<div class="slide-deck">
+    <div class="progress-bar"><div class="progress-fill" id="progress"></div></div>
+    
+    <div class="header-logo">
+        <h4>GRUPO SAN MIGUEL ®</h4>
+        <span>Instituto de Formación Superior</span>
+    </div>
+
+    <div class="slide active" style="text-align: center;">
+ 
+        <h2>INTRODUCCIÓN AL CURSO<br>EVALUACIÓN DE RIESGOS</h2>
+        <p style="font-size: 1.3rem; margin-top: 20px;">Hacia la Gestión Estratégica</p>
+        <div style="margin-top: 40px; border: 1px solid var(--accent); display: inline-block; padding: 15px 40px; border-radius: 50px;">
+            <p style="margin: 0; font-weight: bold;">Docente: Cristian Daniel Molina</p>
+            <small>APP, CSO - Director Académico</small>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>La Evolución de la Estrategia (2018-2025)</h2>
+        <p>Transformación de Grupo San Miguel: del servicio básico a la gestión basada en estándares.</p>
+        
+        <div class="timeline">
+            <div class="timeline-item">
+                <span class="timeline-year">2018</span>
+                <h4>Cambio de Enfoque</h4>
+                <small>Inicio del desarrollo de Asuntos Internos.</small>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">2018-2024</span>
+                <h4>Profesionalización</h4>
+                <small>Seminario Norma API 80. Apertura a ASIS International (Cap. 215). Implementación de Gerencia Preventiva (PBSV y PCI).</small>
+            </div>
+            <div class="timeline-item">
+                <span class="timeline-year">ACTUALIDAD</span>
+                <h4>Consolidación</h4>
+                <small>Procesos trazables y Campus de Capacitación Propio.</small>
+            </div>
+        </div>
+        <div class="box" style="margin-top: 20px; text-align: center;">
+            <em>"El primer paso para un servicio equilibrado es realizar un estudio de seguridad basado en estándares globales."</em>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>El Perfil del Analista de Riesgos Moderno</h2>
+        <p>5 Competencias Clave para superar la operación táctica básica:</p>
+        
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="box"><strong>1. Gestión Integral:</strong> Identificación de problemas reales (no síntomas).</div>
+            <div class="box"><strong>2. Terminología Técnica:</strong> Manejo de conceptos (Amenaza, Vulnerabilidad, Riesgo).</div>
+            <div class="box"><strong>3. Enfoque Holístico:</strong> Mirada "All-Hazard" (Crimen, Accidentes, Naturales, Procesos).</div>
+            <div class="box"><strong>4. Soluciones ARTE:</strong> Aceptar, Reducir, Transferir, Evitar.</div>
+            <div class="box" style="grid-column: span 2;"><strong>5. Visión Financiera:</strong> Análisis Costo-Beneficio y ROI para el negocio.</div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>Gestión de Riesgos de Seguridad Empresarial (ESRM)</h2>
+        <p>Ciclo Estratégico de ASIS International:</p>
+        
+        <div class="esrm-container">
+            <div class="esrm-center">
+                <h3>ASIS</h3>
+                <span>ESRM</span>
+            </div>
+            <div class="esrm-box">1. IDENTIFICAR Y PRIORIZAR ACTIVOS</div>
+            <div class="esrm-box">2. IDENTIFICAR Y PRIORIZAR RIESGOS</div>
+            <div class="esrm-box">4. MONITOREO Y MEJORA CONTINUA</div>
+            <div class="esrm-box">3. MITIGAR RIESGOS PRIORIZADOS</div>
+        </div>
+        <div style="text-align: center; margin-top: 15px; font-size: 0.9rem; color: #666;">
+            Basado en: Misión, Visión, Valores, Entorno y Partes Interesadas.
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>El Enfoque de Sistemas de Gestión</h2>
+        <p>Ninguna actividad es una isla. Todo está interconectado.</p>
+        
+        <div class="process-flow">
+            <div class="flow-box" style="background: #7f8c8d;">
+                <strong>ENTRADA (Input)</strong><br>
+                <small>Recursos e Información</small>
+            </div>
+            <div class="arrow">&#8594;</div>
+            <div class="flow-box">
+                <strong>PROCESO</strong><br>
+                <small>Tarea de Seguridad (Ej. Análisis)</small>
+            </div>
+            <div class="arrow">&#8594;</div>
+            <div class="flow-box" style="background: var(--accent);">
+                <strong>SALIDA (Output)</strong><br>
+                <small>Resultado (Ej. Control)</small>
+            </div>
+        </div>
+        
+        <div class="box" style="margin-top: 40px; text-align: center; border-color: var(--accent);">
+            <strong>LA REGLA DE ORO:</strong> La salida de un proceso se convierte en la entrada del siguiente.<br>
+            <em>Si el primero falla, contamina toda la cadena.</em>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>El Motor de la Mejora Continua (Ciclo PHVA)</h2>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+            <div class="std-card" style="border-left-color: var(--primary);">
+                <h3>P - PLANIFICAR</h3>
+                <p>Políticas y objetivos basados en riesgos reales. Aprobación de Alta Dirección.</p>
+            </div>
+            <div class="std-card" style="border-left-color: var(--accent);">
+                <h3>H - HACER</h3>
+                <p>Implementar procesos, capacitar y operar los controles definidos.</p>
+            </div>
+            <div class="std-card" style="border-left-color: var(--accent);">
+                <h3>A - ACTUAR</h3>
+                <p>Corregir desvíos. Estandarizar lo que funciona.</p>
+            </div>
+            <div class="std-card" style="border-left-color: var(--primary);">
+                <h3>V - VERIFICAR</h3>
+                <p>Auditorías y métricas. No asumir, medir con datos.</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>¿Qué es un Estándar?</h2>
+        <p>Analogía de Interoperabilidad (El Caso USB).</p>
+        
+        <div style="display: flex; gap: 20px; align-items: flex-start;">
+            <div style="flex: 1;">
+                <div class="box">
+                    <strong>Definición Técnica:</strong><br>
+                    Documento establecido por CONSENSO, aprobado por un ORGANISMO RECONOCIDO y destinado al USO REPETIDO.
+                </div>
+                <ul style="list-style: none; padding: 0;">
+                    <li style="margin-bottom: 15px;">🛑 <strong>LEY (Obligatoria):</strong> Impuesta por el Poder Legislativo.</li>
+                    <li>✅ <strong>ESTÁNDAR (Voluntario):</strong> Mejores prácticas de calidad. Se vuelve obligatorio si la empresa certifica o una ley lo exige.</li>
+                </ul>
+            </div>
+            <div style="flex: 1; display: flex; justify-content: center; align-items: center; border: 2px dashed #ccc; border-radius: 10px; height: 100%;">
+                <h3 style="color: #999;">ESTÁNDAR UNIVERSAL<br>=<br>COMPATIBILIDAD GLOBAL</h3>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>Ecosistema de Normas Vigentes</h2>
+        <div class="standards-grid">
+            <div class="std-card">
+                <h3>ISO 9001 (Calidad)</h3>
+                <p>Documentación de procedimientos para servicio consistente y satisfacción del cliente.</p>
+            </div>
+            <div class="std-card">
+                <h3>ISO 31000 (Riesgo)</h3>
+                <p>El riesgo como "efecto de la incertidumbre". No se elimina, se gestiona.</p>
+            </div>
+            <div class="std-card">
+                <h3>ASIS SRA (Evaluación)</h3>
+                <p>Security Risk Assessment. Estándar técnico para estudios de seguridad integrales.</p>
+            </div>
+            <div class="std-card">
+                <h3>ASIS PAP (Protección)</h3>
+                <p>Physical Asset Protection. Diseño de seguridad en profundidad (capas).</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>Certificación y Reputación Profesional</h2>
+        <h3 style="text-align: center; margin-bottom: 30px;">"PARECER. SER. SOSTENER."</h3>
+        
+        <div style="display: flex; gap: 30px;">
+            <div style="flex: 1;">
+                <h4>Certificación APP</h4>
+                <p><em>Associate Protection Professional</em></p>
+                <p>Para profesionales con 1-4 años de experiencia. Valida fundamentos, operaciones y gestión.</p>
+            </div>
+            <div style="flex: 1; border-left: 2px solid #ddd; padding-left: 30px;">
+                <h4>Impacto en Carrera</h4>
+                <ul>
+                    <li><strong>Lenguaje Común:</strong> Respeto de la Alta Dirección.</li>
+                    <li><strong>Justificación:</strong> Migrar de "sensaciones" a ROI.</li>
+                    <li><strong>Visión 360°:</strong> Física, Info, Finanzas, Continuidad.</li>
+                    <li><strong>Auditoría:</strong> Capacidad de evaluar procesos propios.</li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h2>Biblioteca Técnica Obligatoria</h2>
+        <p>La lectura completa es indispensable para la aprobación.</p>
+        
+        <div style="display: flex; justify-content: center; gap: 20px; margin-top: 30px;">
+            <div style="background: var(--primary); color: white; padding: 20px; border-radius: 8px; width: 150px; text-align: center;">Guía ESRM</div>
+            <div style="background: var(--accent); color: white; padding: 20px; border-radius: 8px; width: 150px; text-align: center;">Estándar PAP</div>
+            <div style="background: var(--primary); color: white; padding: 20px; border-radius: 8px; width: 150px; text-align: center;">Guía GSRA</div>
+        </div>
+
+        <div class="box" style="margin-top: 40px; border-color: var(--accent); background: #fffbf0;">
+            <strong>ÉTICA Y CONFIDENCIALIDAD:</strong><br>
+            Este material es exclusivo para Grupo San Miguel. El propósito es proteger vidas y activos siguiendo la norma ISO 31000.
+        </div>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="move(-1)">&#8592; Anterior</button>
+        <button class="btn-reset" onclick="resetSlide()">Reiniciar</button>
+        <button id="nextBtn" onclick="move(1)">Siguiente &#8594;</button>
+    </div>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressFill = document.getElementById('progress');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function update() {
+        slides.forEach((s, i) => {
+            s.classList.remove('active');
+            if (i === currentSlide) s.classList.add('active');
+        });
+
+        // Actualizar barra
+        const pct = ((currentSlide + 1) / slides.length) * 100;
+        progressFill.style.width = pct + '%';
+
+        // Botones
+        prevBtn.disabled = currentSlide === 0;
+        if (currentSlide === slides.length - 1) {
+            nextBtn.innerText = "Finalizar";
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.innerText = "Siguiente \u2192";
+            nextBtn.disabled = false;
+        }
+    }
+
+    function move(dir) {
+        if (currentSlide + dir >= 0 && currentSlide + dir < slides.length) {
+            currentSlide += dir;
+            update();
+        }
+    }
+
+    function resetSlide() {
+        currentSlide = 0;
+        update();
+    }
+
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowRight') move(1);
+        if (e.key === 'ArrowLeft') move(-1);
+    });
+
+    update();
+</script>
+
+</body>
+</html>
+

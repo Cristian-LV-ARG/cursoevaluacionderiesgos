@@ -1,0 +1,313 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Repaso: Introducción y Fundamentos</title>
+    <style>
+        :root {
+            --primary: #003366; /* Azul San Miguel */
+            --secondary: #00509e;
+            --accent: #d4af37; /* Dorado */
+            --text: #333;
+            --bg: #f4f4f4;
+            --card-front: #ffffff;
+            --card-back: #003366;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg);
+            margin: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 650px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: var(--primary);
+            margin: 0;
+            font-size: 1.6rem;
+            text-transform: uppercase;
+            border-bottom: 3px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 5px;
+        }
+
+        p.subtitle {
+            color: #666;
+            margin: 10px 0 0 0;
+            font-size: 0.9rem;
+        }
+
+        /* Escenario 3D */
+        .scene {
+            width: 100%;
+            height: 320px;
+            perspective: 1000px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            border-radius: 15px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.15);
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        /* Frente */
+        .card-front {
+            background-color: var(--card-front);
+            color: var(--primary);
+            border: 2px solid var(--primary);
+        }
+
+        .card-front h3 {
+            font-size: 0.9rem;
+            text-transform: uppercase;
+            color: #888;
+            margin-bottom: 15px;
+            letter-spacing: 1px;
+        }
+
+        .card-front p {
+            font-size: 1.4rem;
+            font-weight: bold;
+            line-height: 1.4;
+        }
+
+        .hint {
+            margin-top: 20px;
+            font-size: 0.8rem;
+            color: var(--secondary);
+            opacity: 0.7;
+            font-style: italic;
+        }
+
+        /* Dorso */
+        .card-back {
+            background-color: var(--card-back);
+            color: white;
+            transform: rotateY(180deg);
+            border: 2px solid var(--accent);
+        }
+
+        .card-back p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Controles */
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            align-items: center;
+            width: 100%;
+            justify-content: center;
+        }
+
+        button {
+            padding: 12px 25px;
+            border: none;
+            background-color: var(--primary);
+            color: white;
+            border-radius: 50px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-weight: 600;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+        }
+
+        button:hover {
+            background-color: var(--secondary);
+            transform: translateY(-2px);
+        }
+
+        button:active {
+            transform: translateY(0);
+        }
+
+        .counter {
+            font-family: monospace;
+            font-size: 1.2rem;
+            color: var(--text);
+            min-width: 80px;
+            text-align: center;
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            width: 100%;
+            height: 6px;
+            background-color: #ddd;
+            border-radius: 3px;
+            margin-top: 20px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--accent);
+            width: 4%;
+            transition: width 0.3s ease;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Introducción a la Gestión de Riesgos</h1>
+            <p class="subtitle">Conceptos Fundamentales</p>
+        </header>
+
+        <div class="scene" onclick="flipCard()">
+            <div class="card" id="flashcard">
+                <div class="card-face card-front">
+                    <h3>Pregunta</h3>
+                    <p id="frontText">Cargando...</p>
+                    <div class="hint">Clic para ver respuesta</div>
+                </div>
+                <div class="card-face card-back">
+                    <p id="backText">Cargando...</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="progress-container">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div class="controls">
+            <button onclick="prevCard()">&#8592; Anterior</button>
+            <div class="counter" id="counter">1 / 25</div>
+            <button onclick="nextCard()">Siguiente &#8594;</button>
+        </div>
+    </div>
+
+    <script>
+        const cards = [
+            { q: "¿Cuál es el objetivo de la transformación de Grupo San Miguel (2018-2025)?", a: "Pasar del servicio básico a la gestión estratégica basada en estándares." },
+            { q: "¿Cuáles son las 5 competencias clave del Analista de Riesgos Moderno?", a: "Gestión Integral, Terminología Técnica, Enfoque Holístico, Soluciones ARTE y Visión Financiera." },
+            { q: "¿Qué significan las siglas ARTE en la gestión de riesgos?", a: "Aceptar, Reducir, Transferir, Evitar." },
+            { q: "¿Qué implica tener un enfoque holístico 'All-Hazard'?", a: "Considerar todo tipo de riesgos: crimen, accidentes, tecnología y naturales." },
+            { q: "¿Qué es el ESRM?", a: "Gestión de Riesgos de Seguridad Empresarial (Enterprise Security Risk Management)." },
+            { q: "En el enfoque de sistemas, ¿cuál es la 'Regla de Oro' de los procesos?", a: "La salida (output) de un proceso se convierte en la entrada (input) del siguiente." },
+            { q: "¿Qué ocurre si el primer proceso de una cadena falla?", a: "Contamina toda la cadena de gestión." },
+            { q: "¿Qué significan las siglas PHVA del ciclo de mejora continua?", a: "Planificar, Hacer, Verificar, Actuar." },
+            { q: "¿Qué se realiza en la etapa 'Verificar' del ciclo PHVA?", a: "Auditorías y métricas. No asumir, medir con datos." },
+            { q: "¿Qué analogía se utiliza para explicar la función de un Estándar?", a: "La analogía del USB: Estándar Universal = Compatibilidad Global." },
+            { q: "¿Cuál es la diferencia principal entre una Ley y un Estándar?", a: "La Ley es obligatoria; el Estándar es voluntario (mejores prácticas), salvo que se exija legalmente." },
+            { q: "¿Cuál es el enfoque principal de la norma ISO 9001?", a: "Gestión de la Calidad y documentación de procedimientos para un servicio consistente." },
+            { q: "¿Cómo define el riesgo la norma ISO 31000?", a: "Como el 'efecto de la incertidumbre' sobre los objetivos." },
+            { q: "¿Para qué sirve el estándar ASIS SRA?", a: "Es el estándar técnico para realizar estudios de seguridad física integrales (Security Risk Assessment)." },
+            { q: "¿Qué cubre el estándar ASIS PAP?", a: "La Protección de Activos Físicos (Physical Asset Protection) y diseño de seguridad en profundidad." },
+            { q: "¿Qué valida la certificación APP (Associate Protection Professional)?", a: "Fundamentos de seguridad, operaciones de negocio y gestión de riesgos para profesionales con 1-4 años de experiencia." },
+            { q: "Según Erving Goffman, ¿cuál es la tríada de la reputación profesional?", a: "Parecer (primera impresión), Ser (capacidad) y Sostener (confianza)." },
+            { q: "¿Qué es un 'Activo' en el contexto de seguridad?", a: "Cualquier cosa que tenga valor para la organización y necesita protección." },
+            { q: "¿Qué es una 'Amenaza'?", a: "La intención y/o capacidad de causar daño." },
+            { q: "¿Qué es una 'Vulnerabilidad'?", a: "La debilidad que permite que la amenaza se materialice." },
+            { q: "¿Por qué es importante usar un 'Lenguaje Común' en la carrera profesional?", a: "Para ser escuchado y respetado por la Alta Dirección." },
+            { q: "¿Qué permite la 'Justificación de Inversiones' basada en datos?", a: "Migrar de 'sensaciones' a reportes con un Retorno de Inversión (ROI) claro." },
+            { q: "¿Qué es la 'Visión 360°' en seguridad?", a: "La integración de seguridad física, información, finanzas y continuidad del negocio." },
+            { q: "¿Qué capacidad otorga la formación como Auditor Interno (ISO 9001)?", a: "La capacidad de evaluar procesos propios con objetividad técnica." },
+            { q: "¿Cuál es el propósito final del material de este curso?", a: "Desarrollar capacidades para proteger vidas y activos siguiendo la norma ISO 31000." }
+        ];
+
+        let currentIndex = 0;
+        const cardElement = document.getElementById('flashcard');
+        const frontText = document.getElementById('frontText');
+        const backText = document.getElementById('backText');
+        const counter = document.getElementById('counter');
+        const progressBar = document.getElementById('progressBar');
+
+        function updateCard() {
+            cardElement.classList.remove('is-flipped');
+            
+            setTimeout(() => {
+                frontText.innerHTML = cards[currentIndex].q;
+                backText.innerHTML = cards[currentIndex].a;
+                counter.innerText = `${currentIndex + 1} / ${cards.length}`;
+                
+                // Actualizar barra de progreso
+                const percentage = ((currentIndex + 1) / cards.length) * 100;
+                progressBar.style.width = `${percentage}%`;
+            }, 200);
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('is-flipped');
+        }
+
+        function nextCard() {
+            if (currentIndex < cards.length - 1) {
+                currentIndex++;
+                updateCard();
+            } else {
+                if(confirm("¡Has completado el repaso! ¿Quieres volver al inicio?")) {
+                    currentIndex = 0;
+                    updateCard();
+                }
+            }
+        }
+
+        function prevCard() {
+            if (currentIndex > 0) {
+                currentIndex--;
+                updateCard();
+            }
+        }
+
+        // Navegación con teclado
+        document.addEventListener('keydown', (e) => {
+            if (e.code === 'Space' || e.code === 'Enter') flipCard();
+            if (e.code === 'ArrowRight') nextCard();
+            if (e.code === 'ArrowLeft') prevCard();
+        });
+
+        // Inicializar
+        updateCard();
+
+    </script>
+</body>
+</html>

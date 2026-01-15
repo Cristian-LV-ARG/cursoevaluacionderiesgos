@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Introductorio: Evaluación de Riesgos</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f7; color: #2c3e50; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #003366; border-bottom: 3px solid #d4af37; padding-bottom: 10px; }
+        .intro { text-align: center; margin-bottom: 30px; font-style: italic; color: #555; }
+        .quiz-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .question-text { font-size: 1.2em; font-weight: bold; margin-bottom: 20px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; cursor: pointer; text-align: left; font-size: 1em; transition: all 0.2s; }
+        .option-btn:hover { background-color: #f0f8ff; border-color: #003366; }
+        .option-btn.correct { background-color: #d4edda; border-color: #28a745; color: #155724; }
+        .option-btn.incorrect { background-color: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
+        .feedback.show { display: block; }
+        .nav-btns { margin-top: 20px; display: flex; justify-content: space-between; }
+        button.nav { padding: 10px 25px; background-color: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button.nav:disabled { background-color: #ccc; cursor: not-allowed; }
+        .score-board { text-align: center; font-size: 1.5em; margin-top: 20px; display: none; }
+        .progress { height: 5px; background: #eee; margin-bottom: 20px; border-radius: 5px; }
+        .progress-bar { height: 100%; background: #d4af37; width: 0%; transition: width 0.3s; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Examen Integrador: Introducción</h1>
+    <p class="intro">Evaluación sobre Fundamentos de Gestión de Riesgos y Estándares</p>
+
+    <div class="quiz-container">
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="quiz">
+            </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="nav-btns">
+            <button class="nav" id="nextBtn" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+
+        <div class="score-board" id="scoreBoard">
+            <h2>Resultados Finales</h2>
+            <p>Tu puntuación: <span id="finalScore">0</span> / 20</p>
+            <p id="finalMessage"></p>
+            <button class="nav" onclick="location.reload()">Reiniciar Examen Presionando F5</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "¿Cuál es el objetivo principal de la evolución estratégica 2018-2025 mencionada?", options: ["Aumentar la cantidad de guardias físicos.", "Pasar de un servicio básico a una gestión basada en estándares.", "Eliminar el uso de tecnología.", "Reducir los costos operativos sin importar la calidad."], answer: 1, feedback: "Correcto. El objetivo es la profesionalización y la gestión basada en estándares globales." },
+            { q: "Según el enfoque de sistemas, ¿cuál es la 'Regla de Oro'?", options: ["El cliente siempre tiene la razón.", "La salida (Output) de un proceso se convierte en la entrada (Input) del siguiente.", "Lo más importante es la tecnología.", "La seguridad física es independiente de la lógica."], answer: 1, feedback: "Correcto. Si un proceso falla en su salida, contamina la entrada del siguiente proceso en la cadena." },
+            { q: "¿Qué significan las siglas 'ESRM'?", options: ["Enterprise Security Risk Management.", "Emergency System Response Mechanism.", "Electronic Security Recording Module.", "External Safety Regulation Manual."], answer: 0, feedback: "Correcto. Se refiere a la Gestión de Riesgos de Seguridad Empresarial." },
+            { q: "¿Cuáles son las fases del ciclo PHVA (Mejora Continua)?", options: ["Pensar, Hablar, Ver, Analizar.", "Planificar, Hacer, Verificar, Actuar.", "Proteger, Habilitar, Vigilar, Asegurar.", "Prevenir, Hallar, Valorar, Auditar."], answer: 1, feedback: "Correcto. Planificar, Hacer, Verificar y Actuar son los pasos del ciclo de mejora." },
+            { q: "En el perfil del analista moderno, ¿qué significa 'Soluciones ARTE'?", options: ["Analizar, Revisar, Testear, Evaluar.", "Aceptar, Reducir, Transferir, Evitar.", "Arte, Responsabilidad, Trabajo, Esfuerzo.", "Asumir, Retener, Tratar, Eliminar."], answer: 1, feedback: "Correcto. Son las cuatro estrategias básicas de tratamiento del riesgo." },
+            { q: "¿Cuál es la diferencia fundamental entre una Ley y un Estándar?", options: ["La Ley es voluntaria y el Estándar obligatorio.", "La Ley es impuesta por el Estado (Obligatoria) y el Estándar es voluntario (Mejores Prácticas).", "No hay diferencia, son lo mismo.", "Los estándares son solo para empresas de tecnología."], answer: 1, feedback: "Correcto. Los estándares son voluntarios salvo que una ley exija su cumplimiento." },
+            { q: "¿Qué define la norma ISO 31000 sobre el riesgo?", options: ["Es la probabilidad de un robo.", "Es el efecto de la incertidumbre sobre los objetivos.", "Es cualquier amenaza física.", "Es la falta de guardias."], answer: 1, feedback: "Correcto. ISO 31000 define riesgo como el efecto de la incertidumbre sobre los objetivos." },
+            { q: "¿Qué valida la certificación APP (Associate Protection Professional)?", options: ["Capacidad de uso de armas de fuego.", "Conocimientos en fundamentos de seguridad y gestión para profesionales con 1-4 años de experiencia.", "Ser experto en ciberseguridad avanzada.", "Haber sido policía."], answer: 1, feedback: "Correcto. Valida fundamentos de seguridad y operaciones de negocio." },
+            { q: "Según Erving Goffman, ¿cuáles son los tres pilares de la reputación profesional?", options: ["Ver, Oír y Callar.", "Parecer, Ser y Sostener.", "Planificar, Ejecutar y Cobrar.", "Estudiar, Trabajar y Jubilarse."], answer: 1, feedback: "Correcto. La primera impresión (Parecer), la capacidad real (Ser) y la consistencia en el tiempo (Sostener)." },
+            { q: "¿Qué es un Activo (Asset)?", options: ["Solo el dinero en efectivo.", "Cualquier cosa que tenga valor para la organización y deba ser protegida.", "Los edificios de la empresa unicamente.", "El personal de seguridad."], answer: 1, feedback: "Correcto. Incluye personas, información, reputación y bienes tangibles." },
+            { q: "¿Qué implica tener una 'Visión Financiera' como competencia clave?", options: ["Saber pagar sueldos.", "Poder realizar análisis de Costo-Beneficio y calcular el ROI de las soluciones.", "Llevar la contabilidad de la empresa.", "Ahorrar en equipamiento."], answer: 1, feedback: "Correcto. El analista debe justificar inversiones con retorno financiero." },
+            { q: "¿Cuál es el enfoque del estándar ISO 9001?", options: ["Gestión Ambiental.", "Gestión de la Calidad y satisfacción del cliente.", "Seguridad de la Información.", "Salud Ocupacional."], answer: 1, feedback: "Correcto. ISO 9001 se centra en la calidad y consistencia de los procesos." },
+            { q: "En la matriz de riesgo, ¿qué dos variables se cruzan?", options: ["Costo y Tiempo.", "Probabilidad y Consecuencia (Impacto).", "Amenaza y Vulnerabilidad.", "Activo y Pasivo."], answer: 1, feedback: "Correcto. El riesgo se evalúa comúnmente en función de su probabilidad e impacto." },
+            { q: "¿Qué es una Vulnerabilidad?", options: ["Una persona que quiere hacernos daño.", "Una debilidad física, lógica o de procedimiento que permite el acceso de una amenaza.", "Un evento natural.", "Una medida de seguridad."], answer: 1, feedback: "Correcto. Es la 'puerta abierta' o debilidad que explota la amenaza." },
+            { q: "¿Qué estándar se utiliza para la Protección de Activos Físicos?", options: ["ISO 14001", "ASIS PAP (Physical Asset Protection)", "NFPA 72", "PCI DSS"], answer: 1, feedback: "Correcto. PAP es el estándar para el diseño de protección física." },
+            { q: "¿Qué es el 'Contexto' en la gestión de riesgos?", options: ["El texto de la norma.", "El entorno interno y externo (social, político, económico) que afecta a la organización.", "El índice del manual.", "La ubicación del guardia."], answer: 1, feedback: "Correcto. Analizar el contexto es vital para no 'adivinar' riesgos." },
+            { q: "¿Qué rol cumple la 'Auditoría Interna'?", options: ["Vigilar a los empleados.", "Evaluar los procesos propios con objetividad técnica para asegurar el cumplimiento.", "Hacer el trabajo de la policía.", "Solo revisar las cuentas."], answer: 1, feedback: "Correcto. Permite la mejora continua y la detección de fallas internas." },
+            { q: "En el ciclo ESRM, ¿cuál es el primer paso mencionado?", options: ["Mitigar riesgos.", "Identificar y priorizar activos.", "Monitoreo continuo.", "Contratar seguros."], answer: 1, feedback: "Correcto. Primero debemos saber qué estamos protegiendo (Activos)." },
+            { q: "¿Qué significa que el analista tenga un enfoque 'Holístico'?", options: ["Que solo mira la seguridad física.", "Que considera todos los riesgos (All-Hazard): crimen, naturales, accidentes, tecnología.", "Que es espiritual.", "Que se enfoca en la ciberseguridad."], answer: 1, feedback: "Correcto. Debe tener una visión integral de todos los peligros posibles." },
+            { q: "¿Cuál es la función del 'Respaldo Web' mencionado en el material?", options: ["Es donde se ven las películas.", "Es una plataforma complementaria (Google Sites) para acceder a los contenidos del curso.", "Es la página de la empresa.", "No tiene función."], answer: 1, feedback: "Correcto. Sirve como repositorio de contenidos y acceso al material." }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            const q = questions[currentQuestion];
+            const feedbackDiv = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.className = 'feedback';
+            nextBtn.disabled = true;
+
+            // Update Progress
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            let html = `<div class="question-card active">
+                <div class="question-text">${currentQuestion + 1}. ${q.q}</div>
+                <div class="options">`;
+            
+            q.options.forEach((opt, index) => {
+                html += `<button class="option-btn" onclick="checkAnswer(${index}, this)">${opt}</button>`;
+            });
+
+            html += `</div></div>`;
+            quizDiv.innerHTML = html;
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            const q = questions[currentQuestion];
+            const feedbackDiv = document.getElementById('feedback');
+            const btns = document.querySelectorAll('.option-btn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Disable all buttons
+            btns.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === q.answer) {
+                btnElement.classList.add('correct');
+                feedbackDiv.innerHTML = `<strong>¡Correcto!</strong> ${q.feedback}`;
+                feedbackDiv.classList.add('show');
+                feedbackDiv.style.backgroundColor = "#d4edda";
+                feedbackDiv.style.color = "#155724";
+                score++;
+            } else {
+                btnElement.classList.add('incorrect');
+                btns[q.answer].classList.add('correct'); // Show correct one
+                feedbackDiv.innerHTML = `<strong>Incorrecto.</strong> ${q.feedback}`;
+                feedbackDiv.classList.add('show');
+                feedbackDiv.style.backgroundColor = "#f8d7da";
+                feedbackDiv.style.color = "#721c24";
+            }
+
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            document.querySelector('.nav-btns').style.display = 'none';
+            document.getElementById('progressBar').style.width = '100%';
+            
+            const scoreBoard = document.getElementById('scoreBoard');
+            scoreBoard.style.display = 'block';
+            document.getElementById('finalScore').innerText = score;
+
+            const msg = document.getElementById('finalMessage');
+            if (score >= 18) {
+                msg.innerText = "¡Excelente! Estás listo para avanzar al siguiente nivel.";
+                msg.style.color = "green";
+            } else if (score >= 14) {
+                msg.innerText = "Buen trabajo. Repasa los conceptos donde fallaste.";
+                msg.style.color = "orange";
+            } else {
+                msg.innerText = "Se recomienda repasar el material del módulo.";
+                msg.style.color = "red";
+            }
+        }
+
+        // Init
+        loadQuestion();
+    </script>
+</body>
+</html>
