@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Examen Módulo 1: Fundamentos y Estándares</title>
+    <style>
+        body { font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; background-color: #f4f6f7; color: #2c3e50; max-width: 800px; margin: 0 auto; padding: 20px; }
+        h1 { text-align: center; color: #003366; border-bottom: 3px solid #d4af37; padding-bottom: 10px; }
+        .intro { text-align: center; margin-bottom: 30px; font-style: italic; color: #555; }
+        .quiz-container { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .question-card { display: none; }
+        .question-card.active { display: block; animation: fadeIn 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .question-text { font-size: 1.2em; font-weight: bold; margin-bottom: 20px; }
+        .options { display: flex; flex-direction: column; gap: 10px; }
+        .option-btn { padding: 15px; border: 2px solid #e0e0e0; border-radius: 8px; background: white; cursor: pointer; text-align: left; font-size: 1em; transition: all 0.2s; }
+        .option-btn:hover { background-color: #f0f8ff; border-color: #003366; }
+        .option-btn.correct { background-color: #d4edda; border-color: #28a745; color: #155724; }
+        .option-btn.incorrect { background-color: #f8d7da; border-color: #dc3545; color: #721c24; }
+        .feedback { margin-top: 20px; padding: 15px; border-radius: 5px; display: none; }
+        .feedback.show { display: block; }
+        .nav-btns { margin-top: 20px; display: flex; justify-content: space-between; }
+        button.nav { padding: 10px 25px; background-color: #003366; color: white; border: none; border-radius: 5px; cursor: pointer; font-weight: bold; }
+        button.nav:disabled { background-color: #ccc; cursor: not-allowed; }
+        .score-board { text-align: center; font-size: 1.5em; margin-top: 20px; display: none; }
+        .progress { height: 5px; background: #eee; margin-bottom: 20px; border-radius: 5px; }
+        .progress-bar { height: 100%; background: #d4af37; width: 0%; transition: width 0.3s; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <h1>Examen Integrador Clase 01</h1>
+    <p class="intro">Evaluación sobre Sistemas de Gestión, Estándares y Profesionalización</p>
+
+    <div class="quiz-container">
+        <div class="progress">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+
+        <div id="quiz">
+            </div>
+
+        <div class="feedback" id="feedback"></div>
+
+        <div class="nav-btns">
+            <button class="nav" id="nextBtn" onclick="nextQuestion()" disabled>Siguiente</button>
+        </div>
+
+        <div class="score-board" id="scoreBoard">
+            <h2>Resultados Finales</h2>
+            <p>Tu puntuación: <span id="finalScore">0</span> / 20</p>
+            <p id="finalMessage"></p>
+            <button class="nav" onclick=""recargarBtn"">Reiniciar Examen Presionando F5</button>
+        </div>
+    </div>
+
+    <script>
+        const questions = [
+            { q: "¿Cuál es la principal diferencia entre 'Seguridad por Intuición' y 'Seguridad basada en Estándares'?", options: ["La intuición es más rápida.", "Los estándares ofrecen un método probado y repetible.", "La intuición es más barata.", "No hay diferencia."], answer: 1, feedback: "Correcto. Los estándares brindan una metodología validada globalmente, a diferencia de la intuición que es subjetiva." },
+            { q: "¿Qué significan las siglas PDCA en el ciclo de mejora continua?", options: ["Planificar, Delegar, Controlar, Actuar", "Programar, Dirigir, Coordinar, Analizar", "Planificar, Hacer, Verificar, Actuar", "Prevenir, Detectar, Controlar, Asumir"], answer: 2, feedback: "Correcto. Planificar (Plan), Hacer (Do), Verificar (Check), Actuar (Act)." },
+            { q: "¿Qué es un Sistema de Gestión?", options: ["Un software caro.", "Una estructura organizada para gestionar procesos y alcanzar objetivos.", "Un conjunto de guardias de seguridad.", "Un manual de leyes."], answer: 1, feedback: "Correcto. Es la estructura organizativa (políticas, procesos, procedimientos) para lograr los objetivos." },
+            { q: "¿Qué norma ISO se enfoca en la Gestión de la Calidad?", options: ["ISO 31000", "ISO 14001", "ISO 27001", "ISO 9001"], answer: 3, feedback: "Correcto. ISO 9001 es el estándar global para Sistemas de Gestión de Calidad." },
+            { q: "¿Cuál es el propósito principal de la norma ISO 31000?", options: ["Gestión de Riesgos", "Gestión Ambiental", "Seguridad Informática", "Calidad"], answer: 0, feedback: "Correcto. ISO 31000 proporciona directrices para la gestión de riesgos." },
+            { q: "¿Qué es ASIS International?", options: ["Una empresa de seguridad privada.", "La organización líder mundial para profesionales de la seguridad.", "Un sindicato de guardias.", "Una agencia gubernamental."], answer: 1, feedback: "Correcto. ASIS es la mayor organización de profesionales de seguridad del mundo." },
+            { q: "¿Qué significa la certificación APP?", options: ["Application Protection Program", "Associate Protection Professional", "Advanced Police Procedure", "Authorized Private Patrol"], answer: 1, feedback: "Correcto. Profesional de Protección Asociado." },
+            { q: "¿Cuál es el estándar específico de ASIS para la evaluación de riesgos físicos?", options: ["ASIS SRA-2024", "ASIS PSP", "ISO 9001", "NFPA 101"], answer: 0, feedback: "Correcto. SRA significa Security Risk Assessment." },
+            { q: "¿Qué beneficio profesional aporta el uso de un sistema de gestión?", options: ["Permite improvisar mejor.", "Aumenta el estrés operativo.", "Genera un lenguaje común con la gerencia.", "Elimina la necesidad de escribir informes."], answer: 2, feedback: "Correcto. Permite hablar en términos de objetivos y riesgos, compatible con la alta dirección." },
+            { q: "¿Qué es la 'Trazabilidad' en un sistema de gestión?", options: ["La capacidad de rastrear la historia y ubicación de algo mediante registros.", "Dibujar planos del edificio.", "Seguir a un sospechoso.", "El trazado de las rondas."], answer: 0, feedback: "Correcto. La trazabilidad permite la rendición de cuentas transparente." },
+            { q: "¿Por qué es importante formarse como Auditor Interno ISO 9001?", options: ["Para cobrar multas.", "Para tener capacidad técnica de revisar procesos y detectar fallas.", "Para ser gerente general automáticamente.", "No es importante."], answer: 1, feedback: "Correcto. Otorga las herramientas para verificar que el sistema funciona." },
+            { q: "¿Qué es 'Compliance'?", options: ["Complicidad con el delito.", "Cumplimiento de normas legales y procedimientos.", "Compra de insumos.", "Competencia desleal."], answer: 1, feedback: "Correcto. Compliance se refiere al cumplimiento normativo y legal." },
+            { q: "¿Qué fase del ciclo PDCA implica corregir los desvíos detectados?", options: ["Planificar", "Hacer", "Verificar", "Actuar"], answer: 3, feedback: "Correcto. 'Actuar' implica tomar medidas para mejorar o corregir." },
+            { q: "¿Qué es un Estándar?", options: ["Una ley obligatoria.", "Una opinión personal.", "Una metodología aprobada globalmente para asegurar calidad.", "Un presupuesto."], answer: 2, feedback: "Correcto. Son 'recetas' de consenso internacional." },
+            { q: "¿Cuál de los siguientes es un beneficio personal de la capacitación basada en normas?", options: ["Mayor empleabilidad nacional e internacional.", "Menos horas de trabajo.", "Poder ignorar a los jefes.", "Tener uniforme nuevo."], answer: 0, feedback: "Correcto. Las normas internacionales son valoradas en todo el mundo." },
+            { q: "La reducción del estrés operativo se logra mediante:", options: ["Ignorar los problemas.", "Procesos confiables y planificados.", "Trabajar más horas.", "Contratar gente más fuerte."], answer: 1, feedback: "Correcto. La planificación y el orden reducen las urgencias y el estrés." },
+            { q: "¿A quiénes certifica ASIS International?", options: ["Solo a empresas.", "A productos de seguridad.", "A personas (profesionales).", "A edificios."], answer: 2, feedback: "Correcto. Las certificaciones (APP, CPP, etc.) son para las personas." },
+            { q: "¿Qué certificación de ASIS es para Gestión de Seguridad Física?", options: ["PCI", "APP", "PSP", "CPP"], answer: 2, feedback: "Correcto. PSP (Physical Security Professional)." },
+            { q: "¿Qué permite justificar decisiones ante la gerencia?", options: ["La intuición.", "El miedo.", "El respaldo técnico de un método estandarizado.", "La antigüedad en el puesto."], answer: 2, feedback: "Correcto. Los datos y estándares son el lenguaje de la gerencia." },
+            { q: "¿Cuál es el objetivo final de este curso modular?", options: ["Aprender a usar armas.", "Sentar la base para la certificación APP.", "Obtener un aumento inmediato.", "Ser auditor externo."], answer: 1, feedback: "Correcto. Es el escalón base hacia la certificación APP." }
+        ];
+
+        let currentQuestion = 0;
+        let score = 0;
+
+        function loadQuestion() {
+            const quizDiv = document.getElementById('quiz');
+            const q = questions[currentQuestion];
+            const feedbackDiv = document.getElementById('feedback');
+            const nextBtn = document.getElementById('nextBtn');
+            
+            feedbackDiv.style.display = 'none';
+            feedbackDiv.className = 'feedback';
+            nextBtn.disabled = true;
+
+            // Update Progress
+            const progress = ((currentQuestion) / questions.length) * 100;
+            document.getElementById('progressBar').style.width = `${progress}%`;
+
+            let html = `<div class="question-card active">
+                <div class="question-text">${currentQuestion + 1}. ${q.q}</div>
+                <div class="options">`;
+            
+            q.options.forEach((opt, index) => {
+                html += `<button class="option-btn" onclick="checkAnswer(${index}, this)">${opt}</button>`;
+            });
+
+            html += `</div></div>`;
+            quizDiv.innerHTML = html;
+        }
+
+        function checkAnswer(selectedIndex, btnElement) {
+            const q = questions[currentQuestion];
+            const feedbackDiv = document.getElementById('feedback');
+            const btns = document.querySelectorAll('.option-btn');
+            const nextBtn = document.getElementById('nextBtn');
+
+            // Disable all buttons
+            btns.forEach(btn => btn.disabled = true);
+
+            if (selectedIndex === q.answer) {
+                btnElement.classList.add('correct');
+                feedbackDiv.innerHTML = `<strong>¡Correcto!</strong> ${q.feedback}`;
+                feedbackDiv.classList.add('show');
+                feedbackDiv.style.backgroundColor = "#d4edda";
+                feedbackDiv.style.color = "#155724";
+                score++;
+            } else {
+                btnElement.classList.add('incorrect');
+                btns[q.answer].classList.add('correct'); // Show correct one
+                feedbackDiv.innerHTML = `<strong>Incorrecto.</strong> ${q.feedback}`;
+                feedbackDiv.classList.add('show');
+                feedbackDiv.style.backgroundColor = "#f8d7da";
+                feedbackDiv.style.color = "#721c24";
+            }
+
+            nextBtn.disabled = false;
+        }
+
+        function nextQuestion() {
+            currentQuestion++;
+            if (currentQuestion < questions.length) {
+                loadQuestion();
+            } else {
+                showResults();
+            }
+        }
+
+        function showResults() {
+            document.getElementById('quiz').style.display = 'none';
+            document.getElementById('feedback').style.display = 'none';
+            document.querySelector('.nav-btns').style.display = 'none';
+            document.getElementById('progressBar').style.width = '100%';
+            
+            const scoreBoard = document.getElementById('scoreBoard');
+            scoreBoard.style.display = 'block';
+            document.getElementById('finalScore').innerText = score;
+
+            const msg = document.getElementById('finalMessage');
+            if (score >= 18) {
+                msg.innerText = "¡Excelente! Estás listo para avanzar al siguiente nivel.";
+                msg.style.color = "green";
+            } else if (score >= 14) {
+                msg.innerText = "Buen trabajo. Repasa los conceptos donde fallaste.";
+                msg.style.color = "orange";
+            } else {
+                msg.innerText = "Se recomienda repasar el material del módulo.";
+                msg.style.color = "red";
+            }
+        }
+
+        // Init
+        loadQuestion();
+    </script>
+</body>
+</html>
