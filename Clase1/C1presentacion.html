@@ -1,0 +1,507 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clase 01: Sistemas de Gestión Aplicados</title>
+    <style>
+        :root {
+            --primary: #003366; /* Azul San Miguel */
+            --accent: #d4af37;  /* Dorado Institucional */
+            --text: #333;
+            --bg: #1a1a1a;
+            --slide-bg: #ffffff;
+            --danger: #c0392b;
+            --success: #27ae60;
+            --warning: #f39c12;
+        }
+
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg);
+            height: 100vh;
+            width: 100vw;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+            overflow: hidden;
+        }
+
+        /* Contenedor Principal (Ratio 16:9) */
+        .slide-deck {
+            background-color: var(--slide-bg);
+            width: 100%;
+            max-width: 1200px;
+            aspect-ratio: 16/9;
+            position: relative;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 0 0 50px rgba(0,0,0,0.5);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+
+        /* Barra de Progreso */
+        .progress-bar {
+            height: 6px;
+            background: #eee;
+            width: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 100;
+        }
+        .progress-fill {
+            height: 100%;
+            background: var(--accent);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Diapositivas */
+        .slide {
+            flex: 1;
+            display: none; /* Ocultas por defecto */
+            padding: 40px 60px;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            text-align: center;
+            animation: fadeIn 0.5s ease;
+            position: relative;
+        }
+
+        .slide.active {
+            display: flex;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Tipografía */
+        h1 {
+            color: var(--primary);
+            font-size: 2.8rem;
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        h2 {
+            color: var(--text);
+            font-size: 1.8rem;
+            font-weight: 400;
+            margin-bottom: 2rem;
+            border-bottom: 3px solid var(--accent);
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        h3 {
+            color: var(--primary);
+            font-size: 1.4rem;
+            margin: 1rem 0;
+        }
+
+        p, li {
+            font-size: 1.2rem;
+            color: #555;
+            line-height: 1.6;
+            margin-bottom: 15px;
+        }
+
+        ul {
+            text-align: left;
+            padding-left: 20px;
+        }
+
+        .highlight {
+            color: var(--primary);
+            font-weight: bold;
+        }
+
+        .small-text {
+            font-size: 0.9rem;
+            color: #888;
+            margin-top: 2rem;
+        }
+
+        /* GRÁFICOS Y DIAGRAMAS CSS */
+        
+        /* Cajas de Conceptos */
+        .concept-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            width: 100%;
+            margin-top: 20px;
+        }
+        
+        .concept-card {
+            background: #f8f9fa;
+            border-left: 5px solid var(--primary);
+            padding: 20px;
+            border-radius: 4px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            text-align: left;
+        }
+
+        /* Matriz de Riesgo Visual */
+        .risk-matrix {
+            display: grid;
+            grid-template-columns: auto 1fr 1fr;
+            grid-template-rows: auto 1fr 1fr;
+            gap: 5px;
+            margin: 20px auto;
+            width: 70%;
+        }
+        .matrix-header { font-weight: bold; padding: 10px; display: flex; align-items: center; justify-content: center; }
+        .matrix-cell { 
+            padding: 30px; 
+            color: white; 
+            font-weight: bold; 
+            text-shadow: 0 1px 2px rgba(0,0,0,0.5);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+        .low-risk { background-color: var(--success); }
+        .med-risk { background-color: var(--warning); }
+        .high-risk { background-color: var(--danger); }
+
+        /* Diagrama Riesgo Residual */
+        .residual-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 30px;
+        }
+        .circle-risk {
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+            text-align: center;
+            font-size: 0.9rem;
+            position: relative;
+        }
+        .arrow { font-size: 2rem; color: #aaa; }
+        
+        /* Diagrama Silos vs Sistema */
+        .comparison-table {
+            width: 90%;
+            border-collapse: collapse;
+            margin-top: 20px;
+        }
+        .comparison-table th { background: var(--primary); color: white; padding: 15px; }
+        .comparison-table td { border: 1px solid #ddd; padding: 15px; width: 50%; vertical-align: top; }
+        .old-way { background: #fff0f0; }
+        .new-way { background: #f0f8ff; }
+
+        /* Controles de Navegación */
+        .controls {
+            height: 80px;
+            background: #f4f4f4;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 0 40px;
+            border-top: 1px solid #ddd;
+        }
+
+        button {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            border-radius: 5px;
+            font-size: 1rem;
+            cursor: pointer;
+            transition: background 0.3s;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #004080;
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+        }
+
+        .btn-reset {
+            background-color: var(--accent);
+            color: var(--primary);
+        }
+        .btn-reset:hover {
+            background-color: #bfa345;
+        }
+
+        /* Logos y Marcas */
+        .logo-area {
+            position: absolute;
+            top: 20px;
+            right: 40px;
+            font-weight: bold;
+            color: var(--primary);
+            opacity: 0.5;
+        }
+
+    </style>
+</head>
+<body>
+
+<div class="slide-deck">
+    <div class="progress-bar">
+        <div class="progress-fill" id="progressFill"></div>
+    </div>
+
+    <div class="logo-area">GRUPO SAN MIGUEL ®</div>
+
+    <div class="slide active">
+        <h3 style="color: var(--accent); margin-bottom: 0;">INSTITUTO DE FORMACIÓN SUPERIOR</h3>
+        <h1>SISTEMAS DE GESTIÓN APLICADOS</h1>
+        <h2 style="border: none;">Introducción al Análisis de Riesgos de Seguridad Patrimonial</h2>
+        <div style="margin-top: 40px; border-top: 2px solid var(--accent); padding-top: 20px; width: 60%;">
+            <p><strong>Docente Titular:</strong> Abg. Cristian Daniel Molina (APP, CSO)</p>
+            <p><strong>Tema:</strong> Clase 01 - Fundamentos y Evolución</p>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>Evolución Profesional</h1>
+        <h2>Del "Parecer" al "Ser" y "Sostener"</h2>
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h3>Primera Impresión</h3>
+                <p>Basada en Erving Goffman. Nos clasifican en minutos por modales, vocabulario y vestimenta. Es inevitable.</p>
+            </div>
+            <div class="concept-card" style="border-left-color: var(--accent);">
+                <h3>El Valor Real</h3>
+                <p>No basta con parecer. Hay que <strong>sostener la confianza</strong> en el tiempo, perfeccionando el desempeño y aportando valor real a la empresa.</p>
+            </div>
+        </div>
+        <p style="margin-top: 20px;"><em>"Las empresas buscan profesionales certificados (APP, CPP) igual que buscan proveedores certificados (ISO)."</em></p>
+    </div>
+
+    <div class="slide">
+        <h1>Los 4 Pilares Conceptuales</h1>
+        <div class="concept-grid" style="grid-template-columns: 1fr 1fr; gap: 15px;">
+            <div class="concept-card">
+                <h3>🛡️ Activo (Asset)</h3>
+                <p>Lo que tiene valor y queremos proteger (Personas, Información, Reputación, Bienes).</p>
+            </div>
+            <div class="concept-card" style="border-left-color: var(--danger);">
+                <h3>🥷 Amenaza (Threat)</h3>
+                <p>Intención + Capacidad. Quién o qué puede causarnos daño (Delincuente, Naturaleza, Error).</p>
+            </div>
+            <div class="concept-card" style="border-left-color: var(--warning);">
+                <h3>🔓 Vulnerabilidad</h3>
+                <p>La debilidad física, lógica o de procedimiento que permite el acceso de la amenaza.</p>
+            </div>
+            <div class="concept-card" style="border-left-color: #555;">
+                <h3>⚠️ Riesgo</h3>
+                <p>El cruce de los anteriores. <strong>Efecto de la incertidumbre sobre los objetivos.</strong></p>
+            </div>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>¿Cómo Medimos el Riesgo?</h1>
+        <p>El cruce entre Probabilidad y Consecuencia</p>
+        
+        <div class="risk-matrix">
+            <div></div>
+            <div class="matrix-header">Baja Probabilidad</div>
+            <div class="matrix-header">Alta Probabilidad</div>
+            
+            <div class="matrix-header" style="writing-mode: vertical-rl; transform: rotate(180deg);">Bajo Impacto</div>
+            <div class="matrix-cell low-risk">
+                RIESGO BAJO<br>
+                <small>(Monitorear)</small>
+            </div>
+            <div class="matrix-cell med-risk">
+                RIESGO MEDIO<br>
+                <small>(Mitigar)</small>
+            </div>
+
+            <div class="matrix-header" style="writing-mode: vertical-rl; transform: rotate(180deg);">Alto Impacto</div>
+            <div class="matrix-cell med-risk">
+                RIESGO MEDIO<br>
+                <small>(Transferir/Mitigar)</small>
+            </div>
+            <div class="matrix-cell high-risk">
+                RIESGO ALTO<br>
+                <small>(Actuar Inmediato)</small>
+            </div>
+        </div>
+        <p class="small-text">Ejemplo: Impacto en Nómina vs Probabilidad de Ocurrencia</p>
+    </div>
+
+    <div class="slide">
+        <h1>El Concepto de Riesgo Residual</h1>
+        <h2>"La Mancha que queda"</h2>
+        
+        <div class="residual-container">
+            <div class="circle-risk" style="background: var(--danger); width: 140px; height: 140px;">
+                RIESGO<br>INHERENTE<br>(Total)
+            </div>
+            <div class="arrow">&#10132;</div>
+            <div style="text-align: center;">
+                <div style="border: 3px solid var(--primary); padding: 10px; border-radius: 5px; font-weight: bold; color: var(--primary);">
+                    MEDIDAS DE SEGURIDAD
+                </div>
+                <small>(Controles, Guardias, CCTV)</small>
+            </div>
+            <div class="arrow">&#10132;</div>
+            <div class="circle-risk" style="background: var(--warning); width: 100px; height: 100px; color: #333;">
+                RIESGO<br>RESIDUAL
+            </div>
+        </div>
+        
+        <div class="concept-card" style="margin-top: 30px; width: 80%;">
+            <p><strong>Recuerda:</strong> La seguridad al 100% no existe. Siempre queda un residuo que la empresa debe aceptar o gestionar.</p>
+        </div>
+    </div>
+
+    <div class="slide">
+        <h1>La Importancia del Contexto</h1>
+        <p>Una misma acción tiene riesgos diferentes según el escenario.</p>
+        
+        <div class="concept-grid">
+            <div class="concept-card">
+                <h3>🇨🇭 Contexto Estable (Ej. Suiza)</h3>
+                <p>Leyes claras, baja criminalidad, infraestructura confiable.</p>
+                <p><strong>Enfoque:</strong> Prevención tecnológica, cumplimiento normativo.</p>
+            </div>
+            <div class="concept-card" style="border-left-color: var(--danger);">
+                <h3>💣 Contexto Volátil (Ej. Zona Conflicto)</h3>
+                <p>Inestabilidad política, alta criminalidad, corrupción.</p>
+                <p><strong>Enfoque:</strong> Protección física robusta, inteligencia, redundancia.</p>
+            </div>
+        </div>
+        <p style="margin-top: 20px;"><em>El análisis de riesgos sin contexto es solo adivinanza.</em></p>
+    </div>
+
+    <div class="slide">
+        <h1>Cambio de Paradigma</h1>
+        
+        <table class="comparison-table">
+            <thead>
+                <tr>
+                    <th style="background: #7f8c8d;">ENFOQUE TRADICIONAL</th>
+                    <th style="background: var(--primary);">ENFOQUE MODERNO (SRA)</th>
+                </tr>
+            </thead>
+            <tbody>
+                <tr>
+                    <td class="old-way"><strong>Silos Aislados:</strong> Seguridad no habla con RRHH ni Operaciones.</td>
+                    <td class="new-way"><strong>Sistema Integrado:</strong> Comunicación constante con todas las áreas.</td>
+                </tr>
+                <tr>
+                    <td class="old-way"><strong>Rol de Controlador:</strong> Visto como un gasto o molestia.</td>
+                    <td class="new-way"><strong>Socio Estratégico:</strong> Facilita el negocio y protege el valor.</td>
+                </tr>
+                <tr>
+                    <td class="old-way"><strong>Seguridad por Intuición:</strong> "Me parece que..."</td>
+                    <td class="new-way"><strong>Análisis Estructurado:</strong> Basado en normas (ISO 31000) y datos.</td>
+                </tr>
+            </tbody>
+        </table>
+        
+        <h3 style="margin-top: 30px;">"Si no está documentado, no existe."</h3>
+    </div>
+
+    <div class="slide">
+        <h1>Fuentes y Próximos Pasos</h1>
+        
+        <div style="text-align: left; width: 80%;">
+            <p><strong>Bibliografía Base:</strong></p>
+            <ul>
+                <li>ISO 31000:2018 - Gestión de Riesgos (Directrices).</li>
+                <li>ASIS International - Guía ESRM (Enterprise Security Risk Management).</li>
+                <li>ASIS SRA - Standard Security Risk Assessment.</li>
+            </ul>
+        </div>
+
+        <div class="concept-card" style="background: var(--accent); color: white; border: none; text-align: center; margin-top: 30px;">
+            <h2 style="color: var(--primary); border: none; margin: 0;">Próxima Clase: Norma ISO 31000 en profundidad</h2>
+        </div>
+        
+        <p class="small-text">Material desarrollado por Grupo San Miguel - Instituto de Formación Superior</p>
+    </div>
+
+    <div class="controls">
+        <button id="prevBtn" onclick="moveSlide(-1)">&#8592; Anterior</button>
+        <button class="btn-reset" onclick="resetPresentation()">&#8635; Reiniciar</button>
+        <button id="nextBtn" onclick="moveSlide(1)">Siguiente &#8594;</button>
+    </div>
+</div>
+
+<script>
+    let currentSlide = 0;
+    const slides = document.querySelectorAll('.slide');
+    const progressFill = document.getElementById('progressFill');
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+
+    function updateView() {
+        // Mostrar diapositiva actual
+        slides.forEach((s, index) => {
+            s.classList.remove('active');
+            if (index === currentSlide) {
+                s.classList.add('active');
+            }
+        });
+
+        // Actualizar barra de progreso
+        const progress = ((currentSlide + 1) / slides.length) * 100;
+        progressFill.style.width = `${progress}%`;
+
+        // Estado de botones
+        prevBtn.disabled = currentSlide === 0;
+        
+        if (currentSlide === slides.length - 1) {
+            nextBtn.innerHTML = "Finalizar";
+            nextBtn.disabled = true;
+        } else {
+            nextBtn.innerHTML = "Siguiente &#8594;";
+            nextBtn.disabled = false;
+        }
+    }
+
+    function moveSlide(direction) {
+        const newIndex = currentSlide + direction;
+        if (newIndex >= 0 && newIndex < slides.length) {
+            currentSlide = newIndex;
+            updateView();
+        }
+    }
+
+    function resetPresentation() {
+        currentSlide = 0;
+        updateView();
+    }
+
+    // Soporte para teclado
+    document.addEventListener('keydown', (e) => {
+        if (e.key === 'ArrowLeft') moveSlide(-1);
+        if (e.key === 'ArrowRight') moveSlide(1);
+    });
+
+    // Inicializar
+    updateView();
+</script>
+
+</body>
+</html>
