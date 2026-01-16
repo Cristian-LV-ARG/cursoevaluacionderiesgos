@@ -1,0 +1,199 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Ejemplo: Conceptos de Seguridad</title>
+    <style>
+        :root {
+            --primary: #2c3e50;
+            --accent: #e74c3c;
+            --bg: #ecf0f1;
+            --card-front: #ffffff;
+            --card-back: #34495e;
+            --text-front: #2c3e50;
+            --text-back: #ecf0f1;
+        }
+
+        body {
+            font-family: 'Segoe UI', sans-serif;
+            background-color: var(--bg);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+        }
+
+        h2 { color: var(--primary); margin-bottom: 10px; }
+        p.instruccion { color: #7f8c8d; margin-bottom: 30px; font-size: 0.9rem; }
+
+        .scene {
+            width: 300px;
+            height: 200px;
+            perspective: 600px;
+            cursor: pointer;
+        }
+
+        .card {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            transition: transform 0.6s;
+            transform-style: preserve-3d;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+            border-radius: 10px;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            box-sizing: border-box;
+            text-align: center;
+            border-radius: 10px;
+        }
+
+        .card-front {
+            background-color: var(--card-front);
+            color: var(--text-front);
+        }
+
+        .card-back {
+            background-color: var(--card-back);
+            color: var(--text-back);
+            transform: rotateY(180deg);
+            border: 2px solid var(--accent);
+        }
+
+        .category {
+            text-transform: uppercase;
+            font-size: 0.7rem;
+            letter-spacing: 1px;
+            color: #95a5a6;
+            margin-bottom: 10px;
+        }
+
+        .controls {
+            margin-top: 30px;
+            display: flex;
+            gap: 20px;
+            align-items: center;
+        }
+
+        button {
+            padding: 10px 20px;
+            background: var(--primary);
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        button:hover { background: #34495e; }
+
+    </style>
+</head>
+<body>
+
+    <h2>Aprende a usar una tarjeta de memoria</h2>
+    <p class="instruccion">1. Lee la pregunta | 2. Responde mentalmente | 3. Haz clic para girar</p>
+
+    <div class="scene" onclick="flipCard()">
+        <div class="card" id="flashcard">
+            <div class="card-face card-front">
+                <div class="category">Concepto</div>
+                <h3 id="frontText">Cargando...</h3>
+            </div>
+            <div class="card-face card-back">
+                <p id="backText">Cargando...</p>
+            </div>
+        </div>
+    </div>
+
+    <div class="controls">
+        <button onclick="prevCard()">&#8592;</button>
+        <span id="counter">1 / 6</span>
+        <button onclick="nextCard()">&#8594;</button>
+    </div>
+
+    <script>
+        const cards = [
+            { 
+                q: "¿Qué es un ACTIVO (Asset)?", 
+                a: "Cualquier cosa que tiene valor para la organización (tangible o intangible) y debe ser protegida." 
+            },
+            { 
+                q: "¿Qué es una AMENAZA?", 
+                a: "Cualquier indicación, circunstancia o evento con el potencial de causar daño o pérdida a un activo." 
+            },
+            { 
+                q: "¿Qué es una VULNERABILIDAD?", 
+                a: "Una debilidad física, lógica o de procedimiento que puede ser explotada por una amenaza." 
+            },
+            { 
+                q: "Definición de RIESGO (ISO 31000)", 
+                a: "El efecto de la incertidumbre sobre los objetivos." 
+            },
+            { 
+                q: "¿Qué significan las siglas PHVA?", 
+                a: "Planificar, Hacer, Verificar, Actuar. (Ciclo de mejora continua)." 
+            },
+            { 
+                q: "¿Qué es ESRM?", 
+                a: "Enterprise Security Risk Management. Un enfoque estratégico que gestiona los riesgos de seguridad vinculándolos con la misión de la empresa." 
+            }
+        ];
+
+        let current = 0;
+        const cardEl = document.getElementById('flashcard');
+        const front = document.getElementById('frontText');
+        const back = document.getElementById('backText');
+        const counter = document.getElementById('counter');
+
+        function update() {
+            cardEl.classList.remove('is-flipped');
+            setTimeout(() => {
+                front.innerText = cards[current].q;
+                back.innerText = cards[current].a;
+                counter.innerText = (current + 1) + " / " + cards.length;
+            }, 200);
+        }
+
+        function flipCard() {
+            cardEl.classList.toggle('is-flipped');
+        }
+
+        function nextCard() {
+            if (current < cards.length - 1) {
+                current++;
+                update();
+            } else {
+                current = 0; // Volver al inicio
+                update();
+            }
+        }
+
+        function prevCard() {
+            if (current > 0) {
+                current--;
+                update();
+            }
+        }
+
+        update();
+    </script>
+
+</body>
+</html>
