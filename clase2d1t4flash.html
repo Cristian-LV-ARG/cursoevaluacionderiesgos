@@ -1,0 +1,393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Flashcards: Métricas y KPIs (Dominio 1 Tarea 4)</title>
+    <style>
+        :root {
+            --primary-color: #008000; /* Color verde solicitado */
+            --bg-color: #f4f4f9;
+            --text-color: #333;
+            --card-front-bg: #ffffff;
+            --card-back-bg: #003366; /* Azul oscuro para el reverso */
+            --card-back-text: #ffffff;
+        }
+
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px;
+        }
+
+        h1 {
+            color: #2c3e50;
+            text-align: center;
+            margin-bottom: 10px;
+            font-size: 1.8rem;
+        }
+
+        h2 {
+            color: var(--primary-color);
+            font-size: 1rem;
+            margin-top: 0;
+            margin-bottom: 20px;
+            font-weight: normal;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Contenedor Principal */
+        .container {
+            width: 100%;
+            max-width: 600px;
+            perspective: 1000px; /* Necesario para el efecto 3D */
+        }
+
+        /* Barra de Progreso */
+        .progress-container {
+            width: 100%;
+            background-color: #e0e0e0;
+            border-radius: 10px;
+            margin-bottom: 20px;
+            height: 10px;
+            overflow: hidden;
+        }
+
+        .progress-bar {
+            height: 100%;
+            background-color: var(--primary-color);
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+
+        /* Tarjeta */
+        .card {
+            width: 100%;
+            height: 350px;
+            position: relative;
+            transform-style: preserve-3d;
+            transition: transform 0.6s;
+            cursor: pointer;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            border-radius: 15px;
+        }
+
+        .card.is-flipped {
+            transform: rotateY(180deg);
+        }
+
+        .card-face {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            backface-visibility: hidden;
+            border-radius: 15px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 30px;
+            box-sizing: border-box;
+            text-align: center;
+        }
+
+        /* Cara Frontal */
+        .card-front {
+            background-color: var(--card-front-bg);
+            border: 2px solid var(--primary-color);
+        }
+
+        .card-front p {
+            font-size: 1.4rem;
+            font-weight: 600;
+            color: #2c3e50;
+        }
+
+        .hint-text {
+            margin-top: 20px;
+            font-size: 0.9rem;
+            color: #888;
+            font-style: italic;
+        }
+
+        /* Cara Trasera */
+        .card-back {
+            background-color: var(--card-back-bg);
+            color: var(--card-back-text);
+            transform: rotateY(180deg);
+            border: 2px solid var(--primary-color);
+        }
+
+        .card-back p {
+            font-size: 1.2rem;
+            line-height: 1.6;
+        }
+
+        /* Controles */
+        .controls {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            width: 100%;
+            margin-top: 20px;
+        }
+
+        button {
+            padding: 12px 25px;
+            font-size: 1rem;
+            border: none;
+            border-radius: 50px;
+            cursor: pointer;
+            background-color: var(--primary-color);
+            color: white;
+            transition: background 0.3s, transform 0.2s;
+            font-weight: bold;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        }
+
+        button:hover {
+            background-color: #006600;
+            transform: translateY(-2px);
+        }
+
+        button:disabled {
+            background-color: #ccc;
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        .counter {
+            font-size: 1.1rem;
+            font-weight: bold;
+            color: #555;
+        }
+
+    </style>
+</head>
+<body>
+
+    <h1>Dominio 1 - Tarea 4</h1>
+    <h2>Métricas y KPIs en Seguridad</h2>
+
+    <div class="container">
+        <div class="progress-container">
+            <div class="progress-bar" id="progress-bar"></div>
+        </div>
+
+        <div class="card" id="flashcard" onclick="flipCard()">
+            <div class="card-face card-front">
+                <p id="front-text">Cargando...</p>
+                <div class="hint-text">Clic para ver respuesta</div>
+            </div>
+            <div class="card-face card-back">
+                <p id="back-text">Cargando...</p>
+            </div>
+        </div>
+
+        <div class="controls">
+            <button id="prev-btn" onclick="changeCard(-1)">&#8592; Anterior</button>
+            <span class="counter"><span id="current-index">1</span> / <span id="total-count">30</span></span>
+            <button id="next-btn" onclick="changeCard(1)">Siguiente &#8594;</button>
+        </div>
+        
+        <div style="text-align: center; margin-top: 15px;">
+            <button onclick="resetCards()" style="background-color: #555; font-size: 0.9rem; padding: 8px 15px;">Reiniciar</button>
+        </div>
+    </div>
+
+    <script>
+        // Datos de las Flashcards (30 items basados en el material subido)
+        const cardsData = [
+            {
+                front: "¿Cuál es la definición básica de una 'Métrica'?",
+                back: "Es una medida cuantificable utilizada para rastrear y evaluar el estado de un proceso específico (ej. 500 visitas hoy)."
+            },
+            {
+                front: "¿Qué es un KPI (Key Performance Indicator)?",
+                back: "Es una métrica seleccionada que está vinculada directamente a un objetivo estratégico crítico de éxito (ej. reducir robos un 10%)."
+            },
+            {
+                front: "Explique la analogía del automóvil para diferenciar Métrica de KPI.",
+                back: "Métrica = Velocímetro (dice que vas a 100 km/h). KPI = GPS (dice si a esa velocidad llegarás a tiempo al destino)."
+            },
+            {
+                front: "¿Qué son las métricas 'Cuantitativas' (Hard Data)?",
+                back: "Datos numéricos objetivos y estadísticos que no dependen de la opinión (ej. número de incidentes, costos)."
+            },
+            {
+                front: "¿Qué son las métricas 'Cualitativas' (Soft Data)?",
+                back: "Datos basados en la percepción, opinión y subjetividad (ej. encuestas de sensación de seguridad, reputación)."
+            },
+            {
+                front: "¿Qué significa el acrónimo SMART en la definición de objetivos?",
+                back: "Specific (Específico), Measurable (Medible), Achievable (Alcanzable), Relevant (Relevante), Time-bound (Temporal)."
+            },
+            {
+                front: "¿Qué es el ROI (Retorno de Inversión) en seguridad?",
+                back: "Cálculo financiero que compara el beneficio obtenido (o pérdida prevenida) en relación con el costo de la inversión realizada."
+            },
+            {
+                front: "¿Qué es una 'Métrica de Vanidad'?",
+                back: "Un dato que parece impresionante pero no aporta valor real ni indica riesgo (ej. 'el guardia caminó 15 km', 'el firewall bloqueó 1 millón de pings')."
+            },
+            {
+                front: "¿Qué es un 'Leading Indicator' (Indicador Adelantado)?",
+                back: "Una métrica predictiva que señala posibles eventos futuros o condiciones antes de que ocurra una falla (ej. cuasi-accidentes)."
+            },
+            {
+                front: "¿Qué es un 'Lagging Indicator' (Indicador Rezagado)?",
+                back: "Una métrica histórica que informa sobre lo que ya ocurrió; mide el resultado final (ej. total de robos del mes pasado)."
+            },
+            {
+                front: "¿Qué es el Benchmarking?",
+                back: "Proceso de comparar las métricas propias con las de otras empresas líderes o estándares de la industria."
+            },
+            {
+                front: "¿Qué es un Dashboard o Tablero de Control?",
+                back: "Herramienta visual que agrupa los KPIs más importantes para ofrecer una visión rápida del estado de la seguridad a la gerencia."
+            },
+            {
+                front: "En el criterio SMART, ¿qué significa la 'S' (Specific)?",
+                back: "Que el objetivo debe ser concreto. No decir 'mejorar seguridad', sino 'reducir hurtos en almacén'."
+            },
+            {
+                front: "En el criterio SMART, ¿qué significa la 'T' (Time-bound)?",
+                back: "Que el objetivo debe tener un plazo o fecha límite definida para su cumplimiento."
+            },
+            {
+                front: "¿Por qué es un error enfocarse solo en métricas negativas (incidentes)?",
+                back: "Porque si el sistema funciona bien, los incidentes son cero, lo que podría interpretarse falsamente como que seguridad no trabaja."
+            },
+            {
+                front: "¿Qué es la 'Parálisis por Análisis'?",
+                back: "El error de presentar un exceso de datos o gráficos a la gerencia, dificultando la toma de decisiones clara."
+            },
+            {
+                front: "¿Cómo se puede auditar la integridad de las métricas?",
+                back: "Aplicando el ciclo PDCA, verificando las fuentes de datos y cruzando información (ej. reporte de sistema vs. RRHH)."
+            },
+            {
+                front: "¿Qué es la 'Tasa de Falsas Alarmas' (FAR)?",
+                back: "Métrica de eficiencia técnica que mide cuántas alarmas generadas no corresponden a amenazas reales."
+            },
+            {
+                front: "¿Qué mide el 'Tiempo de Respuesta'?",
+                back: "El lapso de tiempo entre la detección de una alarma/evento y la llegada efectiva de la fuerza de respuesta."
+            },
+            {
+                front: "¿Qué es el 'Costo de Reposición'?",
+                back: "Métrica financiera que indica cuánto costaría reemplazar un activo dañado o robado (usado para medir impacto)."
+            },
+            {
+                front: "¿Para qué sirve medir la eficacia del programa de seguridad?",
+                back: "Para justificar presupuestos, demostrar valor a la organización y tomar decisiones basadas en hechos, no en intuiciones."
+            },
+            {
+                front: "Ejemplo de KPI operativo:",
+                back: "'Porcentaje de puntos de control críticos verificados correctamente según el cronograma'."
+            },
+            {
+                front: "¿Cuál es la principal ventaja de los datos cuantitativos?",
+                back: "Son fáciles de graficar, objetivos y permiten defender presupuestos ante directores financieros."
+            },
+            {
+                front: "¿Cuál es la principal ventaja de los datos cualitativos?",
+                back: "Miden el 'clima', la cultura de seguridad y explican el contexto humano que los números no ven."
+            },
+            {
+                front: "En el criterio SMART, ¿qué significa la 'R' (Relevant)?",
+                back: "Que la métrica debe importar al negocio y estar alineada con sus objetivos, no solo interesar al departamento de seguridad."
+            },
+            {
+                front: "Si el objetivo era reducir robos un 10% y se redujeron un 15%, ¿qué indica el KPI?",
+                back: "Indica el éxito del programa, ya que se superó el objetivo estratégico planteado."
+            },
+            {
+                front: "¿Qué es la Gobernanza en relación con las métricas?",
+                back: "Asegurar que la estructura de control y las métricas estén alineadas con la estrategia y dirección general de la empresa."
+            },
+            {
+                front: "Ejemplo de métrica cualitativa en seguridad:",
+                back: "El nivel de satisfacción de los empleados con la iluminación del estacionamiento (percepción de seguridad)."
+            },
+            {
+                front: "¿Qué implica la 'Falta de consistencia' en las métricas?",
+                back: "Cambiar la forma de medir frecuentemente, lo que impide ver tendencias históricas y evaluar el progreso real."
+            },
+            {
+                front: "¿Qué es el Ciclo PDCA en la mejora de métricas?",
+                back: "Planificar (definir qué medir), Hacer (recolectar datos), Verificar (auditar la calidad del dato), Actuar (corregir y mejorar)."
+            }
+        ];
+
+        // Lógica de la aplicación
+        let currentIndex = 0;
+        const totalCards = cardsData.length;
+        const cardElement = document.getElementById('flashcard');
+        const frontText = document.getElementById('front-text');
+        const backText = document.getElementById('back-text');
+        const progressBar = document.getElementById('progress-bar');
+        const currentIndexDisplay = document.getElementById('current-index');
+        const totalCountDisplay = document.getElementById('total-count');
+
+        function loadCard(index) {
+            // Reset giro
+            cardElement.classList.remove('is-flipped');
+            
+            // Pequeña espera para cambiar texto sin que se vea el cambio brusco si estaba girada
+            setTimeout(() => {
+                frontText.textContent = cardsData[index].front;
+                backText.textContent = cardsData[index].back;
+                currentIndexDisplay.textContent = index + 1;
+                updateProgress();
+            }, 150);
+        }
+
+        function flipCard() {
+            cardElement.classList.toggle('is-flipped');
+        }
+
+        function changeCard(direction) {
+            const newIndex = currentIndex + direction;
+            if (newIndex >= 0 && newIndex < totalCards) {
+                currentIndex = newIndex;
+                loadCard(currentIndex);
+            }
+        }
+
+        function resetCards() {
+            currentIndex = 0;
+            loadCard(0);
+        }
+
+        function updateProgress() {
+            const pct = ((currentIndex + 1) / totalCards) * 100;
+            progressBar.style.width = pct + "%";
+            
+            // Estado de botones
+            document.getElementById('prev-btn').disabled = (currentIndex === 0);
+            document.getElementById('next-btn').disabled = (currentIndex === totalCards - 1);
+        }
+
+        // Inicializar
+        document.getElementById('total-count').textContent = totalCards;
+        loadCard(0);
+
+        // Soporte para teclado (Flechas)
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'ArrowRight') changeCard(1);
+            if (e.key === 'ArrowLeft') changeCard(-1);
+            if (e.key === ' ' || e.key === 'Enter') flipCard();
+        });
+
+    </script>
+</body>
+</html>
